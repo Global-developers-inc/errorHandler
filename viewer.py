@@ -29,20 +29,19 @@ COUNT_COLUMNS = 6
 class Contacts(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.nameEdit = QLineEdit()
-        self.dateEdit = QLineEdit()
+        self.hostnameEdit = QLineEdit()
         self.timeEdit = QLineEdit()
-        self.errorEdit = QLineEdit()
-        self.is_adminCheck = QCheckBox()
-        self.check_is_adminCheck = QCheckBox()
+        self.categoryEdit = QLineEdit()
+        self.levelEdit = QLineEdit()
+        self.messageEdit = QLineEdit()
         self.wgt = QWidget(self)
         layout = QHBoxLayout()
-        self.setWindowTitle("Errors")
+        self.setWindowTitle("Events")
         self.resize(WIDTH, HEIGHT)
         # Set up the view and load the data
         self.view = QTableWidget()
         self.view.setColumnCount(COUNT_COLUMNS)
-        self.view.setHorizontalHeaderLabels(["id", "name", "is_admin", "date", "time", "error_text"])
+        self.view.setHorizontalHeaderLabels(["id", "Time", "Hostname", "Category", "Level", "Message"])
         self.update_table()
         layout.addWidget(self.view)
         panel = QWidget()
@@ -58,13 +57,12 @@ class Contacts(QMainWindow):
     def search_wgt(self):
         wgt = QWidget()
         layout = QVBoxLayout()
-        layout.addWidget(self.get_line(QLabel("name"), self.nameEdit))
-        layout.addWidget(self.get_line(QLabel("is_admin\t\t\t\t"), self.is_adminCheck))
-        layout.addWidget(self.get_line(QLabel("date"), self.dateEdit))
-        layout.addWidget(self.get_line(QLabel("time"), self.timeEdit))
-        layout.addWidget(self.get_line(QLabel("error_text"), self.errorEdit))
-        layout.addWidget(self.get_line(QLabel('check "is_admin on search"\t\t'), self.check_is_adminCheck))
-        btn = QPushButton(text="search") 
+        layout.addWidget(self.get_line(QLabel("Hostname"), self.hostnameEdit))
+        layout.addWidget(self.get_line(QLabel("Time\t\t\t\t"), self.timeEdit))
+        layout.addWidget(self.get_line(QLabel("Category"), self.categoryEdit))
+        layout.addWidget(self.get_line(QLabel("Level"), self.levelEdit))
+        layout.addWidget(self.get_line(QLabel("Message"), self.messageEdit))
+        btn = QPushButton(text="Search") 
         btn.clicked.connect(self.search)
         layout.addWidget(btn)
         wgt.setLayout(layout)
@@ -82,7 +80,7 @@ class Contacts(QMainWindow):
     
     def update_table(self, request=""):
         self.view.clear()
-        query = QSqlQuery("SELECT id, name, is_admin, date, time, error_text FROM errors " + request)
+        query = QSqlQuery("SELECT id, REALTIME_TIMESTAMP, HOSTNAME, SYSLOG_FACILITY, PRIORITY, MESSAGE FROM events " + request)
         row = 0
         while query.next():
             self.view.setRowCount(row + 1)
@@ -101,21 +99,21 @@ class Contacts(QMainWindow):
     
     def search(self):
         request = {}
-        name = self.nameEdit.text()
-        date = self.dateEdit.text()
+        hostname = self.hostnameEdit.text()
         time = self.timeEdit.text()
-        error = self.errorEdit.text()
-        is_admin = self.is_adminCheck.isChecked()
-        if name:
-            request["name"] = self.add_brakeys(name)
-        if date: 
-            request["date"] = self.add_brakeys(date)
-        if time:
-            request["time"] = self.add_brakeys(time)
-        if error:
-            request["error_text"] = self.add_brakeys(error)
-        if self.check_is_adminCheck.isChecked():
-            request["is_admin"] = 1 if is_admin else 0
+        category = self.categoryEdit.text()
+        level = self.levelEdit.text()
+        message = self.messageEdit.text()
+        if hostname:
+            request["HOSTNAME"] = self.add_brakeys(hostname)
+        if time: 
+            request["REALTIME_TIMESTAMP"] = self.add_brakeys(time)
+        if category:
+            request["SYSLOG_FACILITY"] = self.add_brakeys(category)
+        if level:
+            request["PRIORITY"] = self.add_brakeys(level)
+        if message:
+            request["MESSAGE"] = self.add_brakeys(message)
         r = []
         for k, v in request.items():
             r.append(f"{k} = {v}")
