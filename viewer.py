@@ -83,10 +83,8 @@ class Contacts(QMainWindow):
     def update_table(self, request=""):
         self.view.clear()
         query = QSqlQuery("SELECT id, name, is_admin, date, time, error_text FROM errors " + request)
-        print("SELECT id, name, is_admin, date, time, error_text FROM errors " + request)
         row = 0
         while query.next():
-            print("HI")
             self.view.setRowCount(row + 1)
             self.view.setItem(row, 0, QTableWidgetItem(str(query.value(0))))
             self.view.setItem(row, 1, QTableWidgetItem(str(query.value(1))))
