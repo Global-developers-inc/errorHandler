@@ -8,13 +8,13 @@ def init_db():
     con = sqlite3.connect('data.db')
     cur = con.cursor()
     cur.execute("""
-    CREATE TABLE IF NOT EXISTS errors (
-	    id INTEGER PRIMARY KEY,
-        name TEXT NOT NULL,
-	    is_admin INTEGER NOT NULL,
-	    date TEXT NOT NULL,
-	    time TEXT NOT NULL,
-        error_text TEXT NOT NULL
+    CREATE TABLE IF NOT EXISTS events (
+	    id                 INTEGER PRIMARY KEY,
+	    REALTIME_TIMESTAMP TEXT NOT NULL,
+	    HOSTNAME           TEXT NOT NULL,
+	    SYSLOG_FACILITY    TEXT NOT NULL,
+        PRIORITY           TEXT NOT NULL,
+        MESSAGE            TEXT NOT NULL
     );
     """)
     con.commit()
@@ -26,8 +26,8 @@ def insert(data) -> int:
     cur = con.cursor()
     try:
         cur.execute("""
-   INSERT INTO errors (is_admin, date, time, name, error_text) VALUES (?, ?, ?, ?, ?)
-        """, (data["is_admin"], data["date"], data["time"], data["name"], data["error_text"]))
+   INSERT INTO events (REALTIME_TIMESTAMP, HOSTNAME, SYSLOG_FACILITY, PRIORITY, MESSAGE) VALUES (?, ?, ?, ?, ?)
+        """, (data["__REALTIME_TIMESTAMP"], data["_HOSTNAME"], data["SYSLOG_FACILITY"], data["PRIORITY"], data["MESSAGE"]))
         con.commit()
         cur.close()
         return 200
