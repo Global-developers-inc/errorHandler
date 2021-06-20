@@ -10,10 +10,10 @@ def init_db():
     cur.execute("""
     CREATE TABLE IF NOT EXISTS errors (
 	    id INTEGER PRIMARY KEY,
-        name TEXT NOT NULL,
-	    is_admin INTEGER NOT NULL,
+	    is_admin TEXT NOT NULL,
 	    date TEXT NOT NULL,
 	    time TEXT NOT NULL,
+        name TEXT NOT NULL,
         error_text TEXT NOT NULL
     );
     """)
